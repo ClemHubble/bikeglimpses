@@ -117,6 +117,3 @@ map.on('load', () => {
         console.error("Error loading JSON:", error);
     });
 });
-
-
-
