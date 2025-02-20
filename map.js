@@ -26,3 +26,21 @@ map.on('load', () => {
           }
     });
 });
+
+map.on('load', () => {
+    map.addSource('cambridge_route', {
+        type: 'geojson',
+        data: 'https://raw.githubusercontent.com/cambridgegis/cambridgegis_data/main/Recreation/Bike_Facilities/RECREATION_BikeFacilities.geojson'
+    });
+
+    map.addLayer({
+        id: 'bike-lanes-2',
+        type: 'line',
+        source: 'cambridge_route',
+        paint: {
+            'line-color': '#808080',
+            'line-width': 5,
+            'line-opacity': 0.6
+          }
+    });
+});
