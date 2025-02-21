@@ -30,3 +30,29 @@ html, body {
     opacity: 0.8;
     pointer-events: auto;
 }
+
+#map circle, .legend > div {
+  --color-departures: steelblue;
+  --color-arrivals: darkorange;
+  --color: color-mix(
+      in oklch,
+      var(--color-departures) calc(100% * var(--departure-ratio)),
+      var(--color-arrivals)
+  );
+}
+
+/* Style the legend container */
+.legend {
+  display: flex;
+  margin-block: 1rem;
+  gap: 1px;
+}
+
+/* Style each legend item */
+.legend > div {
+  flex: 1;
+  background: var(--color);
+  color: white;
+  padding: 0.5rem 2rem;
+  text-align: center;
+}
