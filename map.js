@@ -109,16 +109,37 @@ function updateVisualization() {
         .domain([0, d3.max(filteredStations, d => d.totalTraffic)])
         .range(timeFilter === -1 ? [0, 25] : [3, 50]);
 
-    svg.selectAll('circle')
-        .data(filteredStations)
-        .attr('r', d => radiusScale(d.totalTraffic))
-        .style("--departure-ratio", d => 
-            d.totalTraffic > 0 ? stationFlow(d.departures / d.totalTraffic) : 0.5
-        )
-        .each(function(d) {
-            d3.select(this).select('title')
-                .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
-        });
+    // svg.selectAll('circle')
+    //     .data(filteredStations)
+    //     .attr('r', d => radiusScale(d.totalTraffic))
+    //     .style("--departure-ratio", d => 
+    //         d.totalTraffic > 0 ? stationFlow(d.departures / d.totalTraffic) : 0.5
+    //     )
+    //     .each(function(d) {
+    //         d3.select(this).select('title')
+    //             .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
+    //     });
+
+    const tooltip = d3.select("#tooltip");
+
+    svg.selectAll("circle")
+    .data(filteredStations)
+    .join("circle")
+    .attr("r", d => radiusScale(d.totalTraffic))
+    .style("--departure-ratio", d => 
+        d.totalTraffic > 0 ? stationFlow(d.departures / d.totalTraffic) : 0.5
+    )
+    .on("mouseover", (event, d) => {
+        tooltip.style("display", "block")
+            .html(`${d.totalTraffic} trips<br> ${d.departures} departures<br> ${d.arrivals} arrivals`);
+    })
+    .on("mousemove", (event) => {
+        tooltip.style("left", `${event.pageX + 10}px`)
+               .style("top", `${event.pageY - 20}px`);
+    })
+    .on("mouseout", () => {
+        tooltip.style("display", "none");
+    });
 
     updatePositions(radiusScale);
 }
