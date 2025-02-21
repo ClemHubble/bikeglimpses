@@ -28,6 +28,8 @@ let filteredArrivals = new Map();
 let filteredDepartures = new Map();
 let filteredStations = [];
 
+let stationFlow = d3.scaleQuantize().domain([0, 1]).range([0, 0.5, 1]);
+
 let timeFilter = -1;
 const timeSlider = document.getElementById('timeSlider');
 const selectedTime = document.getElementById('selectedTime');
@@ -103,19 +105,22 @@ function updatePositions(radiusScale) {
 }
 
 function updateVisualization() {
-  const radiusScale = d3.scaleSqrt()
-    .domain([0, d3.max(filteredStations, d => d.totalTraffic)])
-    .range(timeFilter === -1 ? [0, 25] : [3, 50]);
+    const radiusScale = d3.scaleSqrt()
+        .domain([0, d3.max(filteredStations, d => d.totalTraffic)])
+        .range(timeFilter === -1 ? [0, 25] : [3, 50]);
 
-  svg.selectAll('circle')
-    .data(filteredStations)
-    .attr('r', d => radiusScale(d.totalTraffic))
-    .each(function(d) {
-      d3.select(this).select('title')
-        .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
-    });
+    svg.selectAll('circle')
+        .data(filteredStations)
+        .attr('r', d => radiusScale(d.totalTraffic))
+        .style("--departure-ratio", d => 
+            d.totalTraffic > 0 ? stationFlow(d.departures / d.totalTraffic) : 0.5
+        )
+        .each(function(d) {
+            d3.select(this).select('title')
+                .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
+        });
 
-  updatePositions(radiusScale);
+    updatePositions(radiusScale);
 }
 
 map.on('load', () => {
@@ -185,21 +190,17 @@ map.on('load', () => {
                 .domain([0, d3.max(filteredStations, d => d.totalTraffic)])
                 .range(timeFilter === -1 ? [0, 25] : [3, 50]);
 
+            const colorScale = d3.scaleLinear()
+                .domain([0, 1])
+                .range(['darkorange', 'steelblue']);
+            
             const circles = svg.selectAll('circle')
                 .data(filteredStations)
                 .enter()
                 .append('circle')
-                .attr('fill', 'steelblue')
-                .attr('fill-opacity', 0.6)
-                .attr('stroke', 'white')
-                .attr('stroke-width', 1)
-                .attr('opacity', 0.8)
-                .each(function(d) {
-                    d3.select(this)
-                        .append('title')
-                        .text(`${d.totalTraffic} trips (${d.departures} departures, ${d.arrivals} arrivals)`);
-                })
-                .style('pointer-events', 'auto'); 
+                .style("--departure-ratio", d => 
+                    d.totalTraffic > 0 ? stationFlow(d.departures / d.totalTraffic) : 0.5
+                );
 
             updatePositions(radiusScale);
 
