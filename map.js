@@ -34,7 +34,11 @@ const selectedTime = document.getElementById('selectedTime');
 const anyTimeLabel = document.getElementById('anyTime');
 
 function minutesSinceMidnight(date) {
-  return date.getHours() * 60 + date.getMinutes();
+    if (!(date instanceof Date) || isNaN(date)) {
+        console.error("Invalid date:", date);
+        return -1;
+    }
+    return date.getHours() * 60 + date.getMinutes();
 }
 
 function filterTripsbyTime() {
@@ -153,10 +157,11 @@ map.on('load', () => {
 
         const trafficUrl = 'https://dsc106.com/labs/lab07/data/bluebikes-traffic-2024-03.csv';
         d3.csv(trafficUrl).then(tripsData => {
+            console.log("Loaded trips data:", tripsData.slice(0, 5));
             trips = tripsData.map(trip => ({
                 ...trip,
-                started_at: new Date(trip.start_time),
-                ended_at: new Date(trip.end_time)
+                started_at: new Date(trip.started_at),
+                ended_at: new Date(trip.ended_at)
             }));
 
             console.log("Loaded Traffic Data:", trips.length);
