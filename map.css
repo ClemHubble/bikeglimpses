@@ -41,14 +41,12 @@ html, body {
   );
 }
 
-/* Style the legend container */
 .legend {
   display: flex;
   margin-block: 1rem;
   gap: 1px;
 }
 
-/* Style each legend item */
 .legend > div {
   flex: 1;
   background: var(--color);
